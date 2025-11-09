@@ -1,28 +1,23 @@
-.App {
+.container {
+  max-width: 800px;
+  margin: 20px auto;
   text-align: center;
-  max-width: 700px;
-  margin: 30px auto;
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 10px;
+  font-family: Arial, sans-serif;
 }
 
-.student-form input {
+.form input {
   margin: 5px;
   padding: 8px;
 }
 
-button {
-  margin: 4px;
-  padding: 8px 10px;
-}
-
 .student-table {
   width: 100%;
-  margin-top: 20px;
   border-collapse: collapse;
+  margin-top: 20px;
 }
+
 .student-table th,
 .student-table td {
+  border: 1px solid #ddd;
   padding: 8px;
 }

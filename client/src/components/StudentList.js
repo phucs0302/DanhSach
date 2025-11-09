@@ -1,11 +1,15 @@
     import React from "react";
 
-    const StudentList = ({ students, onEdit, onDelete }) => {
+    function StudentList({ students, onEdit, onDelete }) {
+    if (!Array.isArray(students)) {
+        return <p>Dữ liệu không hợp lệ hoặc chưa tải được.</p>;
+    }
+
     return (
-        <table border="1" className="student-table">
+        <table className="student-table">
         <thead>
             <tr>
-            <th>STT</th>
+            <th>ID</th>
             <th>Họ tên</th>
             <th>Tuổi</th>
             <th>Lớp</th>
@@ -13,21 +17,29 @@
             </tr>
         </thead>
         <tbody>
-            {students.map((s, index) => (
-            <tr key={s.id}>
-                <td>{index + 1}</td>
+            {students.length > 0 ? (
+            students.map((s) => (
+                <tr key={s.id}>
+                <td>{s.id}</td>
                 <td>{s.hoten}</td>
                 <td>{s.age}</td>
                 <td>{s.class}</td>
                 <td>
-                <button onClick={() => onEdit(s)}>Sửa</button>
-                <button onClick={() => onDelete(s.id)}>Xóa</button>
+                    <button onClick={() => onEdit(s)}>Sửa</button>
+                    <button onClick={() => onDelete(s.id)}>Xóa</button>
+                </td>
+                </tr>
+            ))
+            ) : (
+            <tr>
+                <td colSpan="5" style={{ textAlign: "center" }}>
+                Chưa có dữ liệu sinh viên
                 </td>
             </tr>
-            ))}
+            )}
         </tbody>
         </table>
     );
-    };
+    }
 
     export default StudentList;

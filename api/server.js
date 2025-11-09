@@ -8,17 +8,18 @@
 
     // ✅ Lấy danh sách sinh viên
     app.get('/api/sinhvien', (req, res) => {
-         db.query("SELECT * FROM sinhvien", (err, results) => {
-    if (err) {
-        console.error("Lỗi truy vấn:", err);
-        return res.status(500).json({ error: "Lỗi truy vấn cơ sở dữ liệu" });
-    }
-    res.json(results); // <-- trả về MẢNG
-});
+
         const   page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;
 
+         db.query("SELECT * FROM sinhvien", (err, results) => {
+            if (err) {
+                console.error("Lỗi truy vấn:", err);
+                return res.status(500).json({ error: "Lỗi truy vấn cơ sở dữ liệu" });
+    }
+    res.json(results); // <-- trả về MẢNG
+}); 
         //đếm tổng số svien
         db.query('SELECT COUNT(*) AS count FROM sinhvien', (err, countResult) => {
         if (err) return res.status(500).json({ error: err.message });

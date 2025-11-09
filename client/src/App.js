@@ -1,60 +1,78 @@
-import React, { useEffect, useState } from "react";
-import "./App.css";
-import StudentForm from "./components/StudentForm";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import StudentList from "./components/StudentList";
-import { getStudents, addStudent, updateStudent, deleteStudent } from "./api";
+import StudentForm from "./components/StudentForm";
+import "./App.css";
 
 function App() {
   const [students, setStudents] = useState([]);
   const [editingStudent, setEditingStudent] = useState(null);
 
-  const loadData = async () => {
-    const res = await getStudents();
-    setStudents(res.data);
+  // ✅ Lấy danh sách sinh viên
+  const fetchStudents = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/sinhvien");
+      if (res.data && Array.isArray(res.data.data)) {
+        setStudents(res.data.data);
+      } else if (Array.isArray(res.data)) {
+        setStudents(res.data);
+      } else {
+        setStudents([]);
+      }
+    } catch (err) {
+      console.error("❌ Lỗi khi tải danh sách sinh viên:", err);
+    }
   };
 
   useEffect(() => {
-  fetch("http://localhost:3000/api/sinhvien")
-    .then(res => res.json())
-    .then(data => {
-      if (Array.isArray(data)) {
-        setStudents(data);
-      } else {
-        console.error("Dữ liệu không phải mảng:", data);
-        setStudents([]);
-      }
-    })
-    .catch(err => console.error("Lỗi API:", err));
-}, []);
+    fetchStudents();
+  }, []);
 
-
-  const handleSave = async (student) => {
-    if (editingStudent) {
-      await updateStudent(editingStudent.id, student);
-    } else {
-      await addStudent(student);
+  // ✅ Thêm sinh viên
+  const addStudent = async (student) => {
+    try {
+      await axios.post("http://localhost:3000/api/sinhvien", student);
+      fetchStudents();
+    } catch (err) {
+      alert("❌ Không thể thêm sinh viên: " + err.response?.data?.error);
     }
-    setEditingStudent(null);
-    loadData();
   };
 
-  const handleEdit = (student) => {
-    setEditingStudent(student);
+  // ✅ Cập nhật sinh viên
+  const updateStudent = async (student) => {
+    try {
+      await axios.put(
+        `http://localhost:3000/api/sinhvien/${student.id}`,
+        student
+      );
+      setEditingStudent(null);
+      fetchStudents();
+    } catch (err) {
+      alert("❌ Lỗi cập nhật: " + err.response?.data?.error);
+    }
   };
 
-  const handleDelete = async (id) => {
-    await deleteStudent(id);
-    loadData();
+  // ✅ Xóa sinh viên
+  const deleteStudent = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/sinhvien/${id}`);
+      fetchStudents();
+    } catch (err) {
+      alert("❌ Lỗi xóa sinh viên: " + err.response?.data?.error);
+    }
   };
 
   return (
-    <div className="App">
+    <div className="container">
       <h1>Quản lý sinh viên</h1>
-      <StudentForm onSave={handleSave} editingStudent={editingStudent} />
+      <StudentForm
+        onSave={editingStudent ? updateStudent : addStudent}
+        editingStudent={editingStudent}
+      />
       <StudentList
         students={students}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        onEdit={setEditingStudent}
+        onDelete={deleteStudent}
       />
     </div>
   );
