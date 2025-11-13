@@ -1,4 +1,4 @@
-    import React, { useState, useEffect } from "react";
+    import React, { useState, useEffect, useCallback} from "react";
 
     function StudentForm({ onSave, editingStudent }) {
     const [student, setStudent] = useState({
@@ -6,17 +6,19 @@
         age: "",
         class: "",
     });
-
+// khi có sv chỉnh sửa, tự động fill form
     useEffect(() => {
         if (editingStudent) setStudent(editingStudent);
     }, [editingStudent]);
 
-    const handleChange = (e) => {
+    //  Xử lý thay đổi input
+    const handleChange = useCallback((e) => {
         const { name, value } = e.target;
-        setStudent({ ...student, [name]: value });
-    };
+    setStudent((prev) => ({ ...prev, [name]: value }));
+}, []);
 
-    const handleSubmit = (e) => {
+// Xử lý submit form
+    const handleSubmit = useCallback((e) => {
         e.preventDefault();
         if (!student.hoten || !student.age || !student.class) {
         alert("Vui lòng nhập đầy đủ thông tin!");
@@ -24,7 +26,9 @@
         }
         onSave(student);
         setStudent({ hoten: "", age: "", class: "" });
-    };
+    },
+    [student, onSave]
+);  
 
     return (
         <form onSubmit={handleSubmit} className="form">

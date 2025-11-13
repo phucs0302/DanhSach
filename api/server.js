@@ -13,24 +13,20 @@
         const limit = parseInt(req.query.limit) || 10;
         const offset = (page - 1) * limit;
 
-         db.query("SELECT * FROM sinhvien", (err, results) => {
-            if (err) {
-                console.error("Lỗi truy vấn:", err);
+        const countQuery = 'SELECT COUNT(*) AS count FROM sinhvien';
+        const dataQuery = 'SELECT * FROM sinhvien LIMIT ? OFFSET ?';
+
+        db.query(countQuery, (err, countResults) => {
+            if (err) 
                 return res.status(500).json({ error: "Lỗi truy vấn cơ sở dữ liệu" });
-    }
-    res.json(results); // <-- trả về MẢNG
-}); 
-        //đếm tổng số svien
-        db.query('SELECT COUNT(*) AS count FROM sinhvien', (err, countResult) => {
-        if (err) return res.status(500).json({ error: err.message });
 
-        const totalItems = countResult[0].count;
-        const totalPages = Math.ceil(totalItems / limit);
+            const totalItems = countResults[0].count;
+            const totalPages = Math.ceil(totalItems / limit);
 
-        //lấy dữ liệu svien
-        const sql = 'SELECT * FROM sinhvien LIMIT ? OFFSET ?';
-        db.query(sql, [limit, offset], (err, results) => {
-            if (err) return res.status(500).json({ error: err.message });
+        db.query(dataQuery, [limit, offset], (err, results) => {
+        if (err) 
+            return res.status(500).json({ error: "Lỗi truy vấn cơ sở dữ liệu" });
+
             res.json({
             data: results,
             pagination: {
@@ -44,15 +40,20 @@
     });
 
     // ✅ Thêm sinh viên mới
-    app.post('/api/sinhvien', (req, res) => {
+app.post("/api/sinhvien", (req, res) => {
     const { hoten, age, class: lop } = req.body;
-    if (!hoten || !age || !lop)
-        return res.status(400).json({ error: 'Thiếu dữ liệu' });
 
-    const sql = 'INSERT INTO sinhvien (hoten, age, class) VALUES (?, ?, ?)';
+    if (!hoten || !age || !lop) {
+        return res.status(400).json({ error: "Thiếu dữ liệu!" });
+    }
+
+    const sql = "INSERT INTO sinhvien (hoten, age, `class`) VALUES (?, ?, ?)";
     db.query(sql, [hoten, age, lop], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ message: 'Thêm thành công', id: result.insertId });
+        if (err) {
+        console.error("❌ Lỗi khi thêm sinh viên:", err);
+        return res.status(500).json({ error: "Lỗi khi thêm sinh viên!" });
+        }
+        res.status(201).json({ message: "✅ Thêm sinh viên thành công!" });
     });
     });
 
@@ -63,10 +64,13 @@
     if (!id || !hoten || !age || !lop)
         return res.status(400).json({ error: "Thiếu dữ liệu" });
 
-    const sql = 'UPDATE sinhvien SET hoten = ?, age = ?, class = ? WHERE id = ?';
-    db.query(sql, [hoten, age, lop, id], (err) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ message: 'Cập nhật thành công' });
+        const sql = "UPDATE sinhvien SET hoten = ?, age = ?, `class` = ? WHERE id = ?";
+    db.query(sql, [hoten, age, lop, id], (err, result) => {
+        if (err) {
+        console.error("❌ Lỗi khi cập nhật sinh viên:", err);
+        return res.status(500).json({ error: "Lỗi khi cập nhật sinh viên!" });
+        }
+        res.json({ message: "✅ Cập nhật thành công!" });
     });
     });
 
@@ -79,6 +83,6 @@
     });
     });
 
-    app.listen(3000, () => {
-    console.log('Server đang chạy trên http://localhost:3000');
+    app.listen(3001, () => {
+    console.log('Server đang chạy trên http://localhost:3001');
     });
