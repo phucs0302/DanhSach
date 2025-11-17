@@ -1,27 +1,6 @@
-    import axios from "axios";
-
-    const API_URL = "http://localhost:3001/api/sinhvien"; 
-
-    // 🟢 Lấy danh sách sinh viên
-    export const getStudents = async () => {
-    const res = await axios.get(API_URL);
-    return res.data.data || res.data; // tùy cấu trúc JSON server trả về
-    };
-
-    // 🟢 Thêm sinh viên mới
-    export const addStudent = async (student) => {
-    const res = await axios.post(API_URL, student);
-    return res.data;
-    };
-
-    // 🟢 Cập nhật sinh viên
-    export const updateStudent = async (id, student) => {
-    const res = await axios.put(`${API_URL}/${id}`, student);
-    return res.data;
-    };
-
-    // 🟢 Xóa sinh viên
-    export const deleteStudent = async (id) => {
-    const res = await axios.delete(`${API_URL}/${id}`);
-    return res.data;
-    };
+import api from './axiosConfig';
+export const fetchStudents = (page=1,limit=10,q='',cls='') => api.get(`/sinhvien?page=${page}&limit=${limit}&q=${encodeURIComponent(q)}&class=${encodeURIComponent(cls)}`);
+export const getStudent = (id) => api.get(`/sinhvien/${id}`);
+export const createStudent = (s) => api.post('/sinhvien', s);
+export const updateStudent = (id,s) => api.put(`/sinhvien/${id}`, s);
+export const removeStudent = (id) => api.delete(`/sinhvien/${id}`);
