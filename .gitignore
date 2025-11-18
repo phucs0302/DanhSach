@@ -1,0 +1,16 @@
+api/node_modules/
+api/.env
+api/logs/
+api/dist/
+api/build/
+
+client/node_modules/
+client/dist/
+client/build/
+
+node_modules/
+.env
+*.log
+
+.DS_Store
+Thumbs.db
